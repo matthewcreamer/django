@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from ..dbo_fields import UnsignedByteField, UnsignedWordField, UnsignedDwordField
 
-class ExpTable(models.Model):
+class Exp(models.Model):
     tblidx = UnsignedDwordField(unique=True)
     dwExp = UnsignedDwordField()
     dwNeed_Exp = UnsignedDwordField()
