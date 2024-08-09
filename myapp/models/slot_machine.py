@@ -17,7 +17,7 @@ class SlotMachine(models.Model):
         return f"(TBLIDX: {self.tblidx})"
     
 class SlotMachineArray(models.Model):
-    id_slot_machine = models.ForeignKey(SlotMachine, on_delete=models.CASCADE, related_name='items')
+    id_slot_machine = models.ForeignKey(SlotMachine, on_delete=models.CASCADE, related_name='SlotMachineArray')
     aItemTblidx = UnsignedDwordField()
     byStack = UnsignedByteField()
     wQuantity = UnsignedWordField()

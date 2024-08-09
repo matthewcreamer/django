@@ -4,7 +4,7 @@ from ..dbo_fields import UnsignedByteField, UnsignedWordField, UnsignedDwordFiel
 
 class Merchant(models.Model):
     tblidx = UnsignedDwordField(unique=True)
-    wszNameText = UnsignedDwordField()
+    wszNameText = models.CharField(max_length=255, blank=True, null=True)
     bySell_Type = UnsignedByteField()
     Tab_Name = UnsignedDwordField()
     dwNeedMileage = UnsignedDwordField()
@@ -14,7 +14,7 @@ class Merchant(models.Model):
         return f"(TBLIDX: {self.tblidx})"
         
 class MerchantArray(models.Model):
-    id_merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='items')
+    id_merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='MerchantArray')
     aItemTblidx = UnsignedDwordField()
     aNeedItemTblidx = UnsignedDwordField()
     abyNeedItemStack = UnsignedByteField()
