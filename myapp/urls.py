@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import download_csv, C_Exp, C_Merchant, C_MerchantArray, C_SlotMachine, C_SlotMachineArray, C_Mob, C_MobDrop, C_MobSkill
+from .views import get_csrf_token, C_ExportCSV, C_ImportCSV, C_Exp, C_Merchant, C_MerchantArray, C_SlotMachine, C_SlotMachineArray, C_Mob, C_MobDrop, C_MobSkill
 
 urlpatterns = [
     # EXP
@@ -30,6 +30,12 @@ urlpatterns = [
     path('mob-skill/', C_MobDrop.as_view(), name='mob-skill'),
     path('mob-skill/id_mob/<int:id_mob>/', C_MobDrop.as_view(), name='mob-skill'),
 
-    # GENERATE CSV
-    path('generate-csv/<str:model_name>/', download_csv, name='generate-csv'),
+    # EXPORT CSV
+    path('export-csv/<str:model_name>/', C_ExportCSV, name='export-csv'),
+
+    # IMPORT CSV
+    path('import-csv/<str:model_name>/', C_ImportCSV, name='import-csv'),
+
+    # GENERATE CSRF TOKEN
+    path('csrf-token/', get_csrf_token, name='get_csrf_token'),
 ]

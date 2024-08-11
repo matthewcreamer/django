@@ -1,12 +1,26 @@
 from rest_framework import generics
 from django.http import HttpRequest
-from .utils import generate_csv
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token
+from .utils import ExportCSV, ImportCSV
 from .models import Exp, Merchant, MerchantArray, SlotMachine, SlotMachineArray, Mob, MobDrop, MobSkill
 from .serializers import S_Exp, S_Merchant, S_MerchantArray, S_SlotMachine, S_SlotMachineArray, S_Mob, S_MobDrop, S_MobSkill
 
 class C_Exp(generics.ListCreateAPIView):
     queryset = Exp.objects.all()
     serializer_class = S_Exp
+
+    def delete(self, request, *args, **kwargs):
+        tblidx = kwargs.get('tblidx')
+
+        if tblidx:
+            exp_instance = Exp.objects.get(tblidx=tblidx)
+            exp_instance.delete()
+            return JsonResponse({'status': f'Exp instance with tblidx {tblidx} deleted'})
+        else:
+            Exp.objects.all().delete()
+            return JsonResponse({'status': 'All Exp instances deleted'})
 
     def get_queryset(self):
         tblidx = self.kwargs.get('tblidx')
@@ -78,5 +92,13 @@ class C_MobSkill(generics.ListCreateAPIView):
 
 
 
-def download_csv(request: HttpRequest, model_name: str):
-    return generate_csv(request, model_name)
+def C_ExportCSV(request: HttpRequest, model_name: str):
+    return ExportCSV(request, model_name)
+
+def C_ImportCSV(request: HttpRequest, model_name: str):
+    return ImportCSV(request, model_name)
+
+@csrf_exempt
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrfToken': csrf_token})
