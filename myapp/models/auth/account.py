@@ -1,38 +1,66 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import AbstractUser, Permission, Group
 
-class Owner(models.Model):
-    username = models.CharField(max_length=16)
-    password = models.CharField(max_length=64)
+class Owner(AbstractUser):
     name = models.CharField(max_length=16)
 
+    # Override default related_name to avoid conflicts with Django's User model
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='owner_permissions',  # Avoids conflict with User.user_permissions
+        blank=True,
+        help_text='Specific permissions for this owner.',
+        related_query_name='owner'
+    )
+    groups = models.ManyToManyField(
+        Group,
+        related_name='owners',  # Avoids conflict with User.groups
+        blank=True,
+        help_text='The groups this owner belongs to.',
+        related_query_name='owner'
+    )
 
     def __str__(self):
-        return f"(Account: {self.name})"
+        return f"(Owner: {self.name})"
 
-class User(models.Model):
-    id_owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name='User')
-    username = models.CharField(max_length=16)
-    password = models.CharField(max_length=64)
+    class Meta:
+        verbose_name = "Owner"
+        verbose_name_plural = "Owners"
+
+class User(AbstractUser):
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name='users')
     name = models.CharField(max_length=16)
-    
+
+    # Override default related_name to avoid conflicts with Django's User model
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='user_permissions',  # Avoids conflict with User.user_permissions
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_query_name='user'
+    )
+    groups = models.ManyToManyField(
+        Group,
+        related_name='users',  # Avoids conflict with User.groups
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_query_name='user'
+    )
 
     def __str__(self):
-        return f"(Account: {self.name})"
-    
+        return f"(User: {self.name} under Owner: {self.owner.name})"
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+
 class UserPermission(models.Model):
-    id_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='UserPermission')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='permissions')
     table = models.CharField(max_length=64)
-    permission = models.CharField(max_length=16)
-    
+    get = models.BooleanField(default=False)
+    put = models.BooleanField(default=False)
+    post = models.BooleanField(default=False)
+    delete = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"(Account: {self.name})"
-
-class Server(models.Model):
-    id_owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name='Server')
-    name = models.CharField(max_length=16)
-    
-
-    def __str__(self):
-        return f"(Account: {self.name})"
+        return f"(User: {self.user.name}, Table: {self.table})"

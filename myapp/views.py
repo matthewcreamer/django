@@ -1,32 +1,28 @@
-from rest_framework import generics
+from rest_framework import generics, mixins, viewsets, status
+from rest_framework.exceptions import NotFound
 from django.http import HttpRequest
 from django.http import JsonResponse
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from django.middleware.csrf import get_token
 from .utils import ExportCSV, ImportCSV
-from .models import Exp, Merchant, MerchantArray, SlotMachine, SlotMachineArray, Mob, MobDrop, MobSkill
-from .serializers import S_Exp, S_Merchant, S_MerchantArray, S_SlotMachine, S_SlotMachineArray, S_Mob, S_MobDrop, S_MobSkill
+from .models import Owner, User, UserPermission, Exp, Merchant, MerchantArray, SlotMachine, SlotMachineArray, Mob, MobDrop, MobSkill
+from .serializers import S_Owner, S_User, S_Exp, S_Merchant, S_MerchantArray, S_SlotMachine, S_SlotMachineArray, S_Mob, S_MobDrop, S_MobSkill
 
-class C_Exp(generics.ListCreateAPIView):
+class C_Exp(viewsets.ModelViewSet):
     queryset = Exp.objects.all()
     serializer_class = S_Exp
 
-    def delete(self, request, *args, **kwargs):
-        tblidx = kwargs.get('tblidx')
-
-        if tblidx:
-            exp_instance = Exp.objects.get(tblidx=tblidx)
-            exp_instance.delete()
-            return JsonResponse({'status': f'Exp instance with tblidx {tblidx} deleted'})
-        else:
-            Exp.objects.all().delete()
-            return JsonResponse({'status': 'All Exp instances deleted'})
-
-    def get_queryset(self):
-        tblidx = self.kwargs.get('tblidx')
-        if tblidx is not None: return Exp.objects.filter(tblidx=tblidx)
-        return Exp.objects.all()
-
+    @action(detail=False, methods=['get'], url_path='tblidx/(?P<tblidx>\d+)')
+    def filter_by_tblidx(self, request, tblidx=None):
+        queryset = self.queryset.filter(tblidx=tblidx)
+        if not queryset.exists():
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
 class C_Merchant(generics.ListCreateAPIView):
     queryset = Merchant.objects.all()
     serializer_class = S_Merchant
@@ -91,6 +87,24 @@ class C_MobSkill(generics.ListCreateAPIView):
         return MobSkill.objects.all()
 
 
+# class OwnerViewSet(viewsets.ModelViewSet):
+#     queryset = Owner.objects.all()
+#     serializer_class = S_Owner
+#     permission_classes = [IsAuthenticated]
+
+# class UserViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = S_User
+#     permission_classes = [IsAuthenticated]
+
+#     def get_queryset(self):
+#         user = self.request.user
+#         if hasattr(user, 'owner'):
+#             return User.objects.filter(owner=user)
+#         return User.objects.none()
+
+#     def perform_create(self, serializer):
+#         serializer.save(owner=self.request.user)
 
 def C_ExportCSV(request: HttpRequest, model_name: str):
     return ExportCSV(request, model_name)

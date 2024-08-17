@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Exp, Merchant, MerchantArray, SlotMachine, SlotMachineArray, Mob, MobDrop, MobSkill
+from .models import Owner, User, UserPermission, Exp, Merchant, MerchantArray, SlotMachine, SlotMachineArray, Mob, MobDrop, MobSkill
 
 class S_Exp(serializers.ModelSerializer):
     class Meta:
@@ -40,3 +40,22 @@ class S_MobSkill(serializers.ModelSerializer):
     class Meta:
         model = MobSkill
         fields = '__all__'
+
+class S_Owner(serializers.ModelSerializer):
+    class Meta:
+        model = Owner
+        fields = '__all__'
+
+class S_User(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def validate(self, data):
+        owner = self.context['request'].user
+        if self.instance is None:  
+            if User.objects.filter(owner=owner).count() >= 3:
+                raise serializers.ValidationError("You can only create up to 3 users.")
+        return data
