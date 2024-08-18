@@ -1,12 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import get_csrf_token, C_ExportCSV, C_ImportCSV, C_Exp, C_Merchant, C_MerchantArray, C_SlotMachine, C_SlotMachineArray, C_Mob, C_MobDrop, C_MobSkill
+from .views import get_csrf_token, C_Login, C_ExportCSV, C_ImportCSV, C_Exp, C_Merchant, C_MerchantArray, C_SlotMachine, C_SlotMachineItems, C_Mob, C_MobDrop, C_MobSkill
 
 router = DefaultRouter()
 router.register(r'exp', C_Exp, basename='exp')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('login/', C_Login, name='login'),
 ]
 
 # urlpatterns = [
@@ -25,8 +26,8 @@ urlpatterns = [
 #     path('slot-machine/', C_SlotMachine.as_view(), name='slot-machine'),
 #     path('slot-machine/tblidx/<int:tblidx>/', C_SlotMachine.as_view(), name='slot-machine-tblidx'),
 
-#     path('slot-machine-array/', C_SlotMachineArray.as_view(), name='slot-machine-array'),
-#     path('slot-machine-array/id_slot_machine/<int:id_slot_machine>/', C_SlotMachineArray.as_view(), name='slot-machine-array-parent'),
+#     path('slot-machine-array/', C_SlotMachineItems.as_view(), name='slot-machine-array'),
+#     path('slot-machine-array/id_slot_machine/<int:id_slot_machine>/', C_SlotMachineItems.as_view(), name='slot-machine-array-parent'),
 
 #     # MOB
 #     path('mob/', C_Mob.as_view(), name='mob'),

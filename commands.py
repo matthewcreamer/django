@@ -4,7 +4,11 @@
 #   run server
 #   python3 manage.py runserver
 
-#   install with pip3
+
+#   delete db
+#   find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+#   find . -path "*/migrations/*.pyc"  -delete
+#   delete db.sqlite3
 
 
 

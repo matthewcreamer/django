@@ -1,8 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import Group
 from django.core.validators import MaxValueValidator, MinValueValidator
 from ..dbo_fields import UnsignedByteField, UnsignedWordField, UnsignedDwordField
+from .auth.account import Owner
 
 class Exp(models.Model):
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name='exp_owner')
+    
     tblidx = UnsignedDwordField(unique=True)
     dwExp = UnsignedDwordField(default=0)
     dwNeed_Exp = UnsignedDwordField(default=0)

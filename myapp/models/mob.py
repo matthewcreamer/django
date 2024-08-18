@@ -89,7 +89,7 @@ class MobDrop(models.Model):
         return f"(Mob ID: {self.id_mob})"
     
 class MobSkill(models.Model):
-    id_mob = models.ForeignKey(Mob, on_delete=models.CASCADE, related_name='MobSkill')
+    mob = models.ForeignKey(Mob, on_delete=models.CASCADE, related_name='mob_skill')
     wUse_Skill_Time = UnsignedWordField(default=0)
     use_Skill_Tblidx = UnsignedDwordField(default=0)
     byUse_Skill_Basis = UnsignedWordField(default=0)

@@ -4,17 +4,16 @@ from django.contrib.auth.models import AbstractUser, Permission, Group
 class Owner(AbstractUser):
     name = models.CharField(max_length=16)
 
-    # Override default related_name to avoid conflicts with Django's User model
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name='owner_permissions',  # Avoids conflict with User.user_permissions
+        related_name='owner_permissions',  
         blank=True,
         help_text='Specific permissions for this owner.',
         related_query_name='owner'
     )
     groups = models.ManyToManyField(
         Group,
-        related_name='owners',  # Avoids conflict with User.groups
+        related_name='owners',  
         blank=True,
         help_text='The groups this owner belongs to.',
         related_query_name='owner'
@@ -31,17 +30,16 @@ class User(AbstractUser):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name='users')
     name = models.CharField(max_length=16)
 
-    # Override default related_name to avoid conflicts with Django's User model
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name='user_permissions',  # Avoids conflict with User.user_permissions
+        related_name='user_permissions',  
         blank=True,
         help_text='Specific permissions for this user.',
         related_query_name='user'
     )
     groups = models.ManyToManyField(
         Group,
-        related_name='users',  # Avoids conflict with User.groups
+        related_name='users',  
         blank=True,
         help_text='The groups this user belongs to.',
         related_query_name='user'

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Owner, User, UserPermission, Exp, Merchant, MerchantArray, SlotMachine, SlotMachineArray, Mob, MobDrop, MobSkill
+from .models import Owner, User, UserPermission, Exp, Merchant, MerchantArray, SlotMachine, SlotMachineItems, Mob, MobDrop, MobSkill
 
 class S_Exp(serializers.ModelSerializer):
     class Meta:
@@ -21,9 +21,9 @@ class S_SlotMachine(serializers.ModelSerializer):
         model = SlotMachine
         fields = '__all__'
 
-class S_SlotMachineArray(serializers.ModelSerializer):
+class S_SlotMachineItems(serializers.ModelSerializer):
     class Meta:
-        model = SlotMachineArray
+        model = SlotMachineItems
         fields = '__all__'
 
 class S_Mob(serializers.ModelSerializer):

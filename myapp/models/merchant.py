@@ -14,7 +14,7 @@ class Merchant(models.Model):
         return f"(TBLIDX: {self.tblidx})"
         
 class MerchantArray(models.Model):
-    id_merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='MerchantArray')
+    merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='merchant_array')
     aItemTblidx = UnsignedDwordField()
     aNeedItemTblidx = UnsignedDwordField()
     abyNeedItemStack = UnsignedByteField()
