@@ -132,20 +132,26 @@ def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({'csrfToken': csrf_token})
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def C_Login(request):
+    # Retrieve data from request
     username = request.data.get('username')
     password = request.data.get('password')
+    
+    # Check if username and password are provided
+    if not username or not password:
+        return JsonResponse({'error': 'Username and password are required.'}, status=400)
 
-    owner = authenticate(request, username=username, password=password)
-    if owner is not None and isinstance(owner, Owner):
-        login(request, owner)
-        return JsonResponse({'message': 'Owner logged in successfully'})
-
+    # Authenticate the user
     user = authenticate(request, username=username, password=password)
-    if user is not None and isinstance(user, User):
-        login(request, user)
-        return JsonResponse({'message': 'User logged in successfully'})
 
+    if user is not None:
+        # Log in the user and return a success message
+        login(request, user)
+        user_type = 'Owner' if isinstance(user, Owner) else 'User'
+        return JsonResponse({'message': f'{user_type} logged in successfully'})
+
+    # Return an error message if authentication fails
     return JsonResponse({'error': 'Invalid credentials'}, status=400)
