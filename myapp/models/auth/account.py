@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission, Group
+from django.contrib.auth.hashers import make_password
 
 class Owner(AbstractUser):
     name = models.CharField(max_length=16)
@@ -18,6 +19,11 @@ class Owner(AbstractUser):
         help_text='The groups this owner belongs to.',
         related_query_name='owner'
     )
+
+    def save(self, *args, **kwargs):
+        if self.password and not self.password.startswith('pbkdf2_sha256$'):
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"(Owner: {self.name})"
@@ -44,6 +50,11 @@ class User(AbstractUser):
         help_text='The groups this user belongs to.',
         related_query_name='user'
     )
+
+    def save(self, *args, **kwargs):
+        if self.password and not self.password.startswith('pbkdf2_sha256$'):
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"(User: {self.name} under Owner: {self.owner.name})"

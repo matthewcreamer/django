@@ -57,19 +57,26 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTH_USER_MODEL = 'myapp.Owner'
+
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    'myapp.backends.CustomUserBackend',  
+    # 'django.contrib.auth.backends.ModelBackend',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = False
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3001',

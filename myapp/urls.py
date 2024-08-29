@@ -1,9 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import get_csrf_token, C_Login, C_ExportCSV, C_ImportCSV, C_Exp, C_Merchant, C_MerchantArray, C_SlotMachine, C_SlotMachineItems, C_Mob, C_MobDrop, C_MobSkill
+from .views import get_csrf_token, C_Login, C_UserPermission, C_ExportCSV, C_ImportCSV, C_Exp, C_Merchant, C_MerchantArray, C_SlotMachine, C_SlotMachineItems, C_Mob, C_MobDrop, C_MobSkill
 
 router = DefaultRouter()
 router.register(r'exp', C_Exp, basename='exp')
+router.register(r'user-permission', C_UserPermission, basename='user-permission')
 
 urlpatterns = [
     path('', include(router.urls)),

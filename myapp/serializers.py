@@ -1,52 +1,60 @@
+from .base import BaseSerializer
 from rest_framework import serializers
 from .models import Owner, User, UserPermission, Exp, Merchant, MerchantArray, SlotMachine, SlotMachineItems, Mob, MobDrop, MobSkill
 
-class S_Exp(serializers.ModelSerializer):
+class S_Exp(BaseSerializer):
     class Meta:
         model = Exp
         fields = '__all__'
+        read_only_fields = ('owner',)  
 
-class S_Merchant(serializers.ModelSerializer):
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request and request.user:
+            validated_data['owner'] = request.user
+        return super().create(validated_data)
+
+class S_Merchant(BaseSerializer):
     class Meta:
         model = Merchant
         fields = '__all__'
 
-class S_MerchantArray(serializers.ModelSerializer):
+class S_MerchantArray(BaseSerializer):
     class Meta:
         model = MerchantArray
         fields = '__all__'
 
-class S_SlotMachine(serializers.ModelSerializer):
+class S_SlotMachine(BaseSerializer):
     class Meta:
         model = SlotMachine
         fields = '__all__'
 
-class S_SlotMachineItems(serializers.ModelSerializer):
+class S_SlotMachineItems(BaseSerializer):
     class Meta:
         model = SlotMachineItems
         fields = '__all__'
 
-class S_Mob(serializers.ModelSerializer):
+class S_Mob(BaseSerializer):
     class Meta:
         model = Mob
         fields = '__all__'
 
-class S_MobDrop(serializers.ModelSerializer):
+class S_MobDrop(BaseSerializer):
     class Meta:
         model = MobDrop
         fields = '__all__'
 
-class S_MobSkill(serializers.ModelSerializer):
+class S_MobSkill(BaseSerializer):
     class Meta:
         model = MobSkill
         fields = '__all__'
 
-class S_Owner(serializers.ModelSerializer):
+class S_Owner(BaseSerializer):
     class Meta:
         model = Owner
         fields = '__all__'
 
-class S_User(serializers.ModelSerializer):
+class S_User(BaseSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
@@ -59,3 +67,8 @@ class S_User(serializers.ModelSerializer):
             if User.objects.filter(owner=owner).count() >= 3:
                 raise serializers.ValidationError("You can only create up to 3 users.")
         return data
+    
+class S_UserPermission(BaseSerializer):
+    class Meta:
+        model = UserPermission
+        fields = '__all__'

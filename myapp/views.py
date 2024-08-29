@@ -1,52 +1,26 @@
-from rest_framework import generics, mixins, viewsets, status
-from rest_framework.exceptions import NotFound
+from rest_framework import generics
 from django.http import HttpRequest
 from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
+from django.apps import apps
 from django.views.decorators.csrf import csrf_exempt
 from django.middleware.csrf import get_token
 from .utils import ExportCSV, ImportCSV
 from .models import Owner, User, UserPermission, Exp, Merchant, MerchantArray, SlotMachine, SlotMachineItems, Mob, MobDrop, MobSkill
-from .serializers import S_Owner, S_User, S_Exp, S_Merchant, S_MerchantArray, S_SlotMachine, S_SlotMachineItems, S_Mob, S_MobDrop, S_MobSkill
+from .serializers import S_Owner, S_User, S_UserPermission, S_Exp, S_Merchant, S_MerchantArray, S_SlotMachine, S_SlotMachineItems, S_Mob, S_MobDrop, S_MobSkill
+from .base import BasePermissionViewSet
+from rest_framework import viewsets, status
 
-class C_Exp(viewsets.ModelViewSet):
+class C_Exp(BasePermissionViewSet):
     queryset = Exp.objects.all()
     serializer_class = S_Exp
 
-    @permission_classes([IsAuthenticated])
-    def get_queryset(self):
-        user = self.request.user
-
-        if isinstance(user, Owner):
-            # If the logged-in user is an Owner, filter by that Owner
-            return self.queryset.filter(owner=user)
-        elif isinstance(user, User):
-            # If the logged-in user is a User, filter by the Owner they belong to
-            return self.queryset.filter(owner=user.owner)
-        else:
-            return self.queryset.none()
-
-    @action(detail=False, methods=['get'], url_path='tblidx/(?P<tblidx>\d+)')
-    def filter_by_tblidx(self, request, tblidx=None):
-        queryset = self.get_queryset().filter(tblidx=tblidx)
-        if not queryset.exists():
-            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-    
-class C_Merchant(generics.ListCreateAPIView):
+class C_Merchant(BasePermissionViewSet):
     queryset = Merchant.objects.all()
     serializer_class = S_Merchant
 
-    def get_queryset(self):
-        tblidx = self.kwargs.get('tblidx')
-        if tblidx is not None: return Merchant.objects.filter(tblidx=tblidx)
-        return Merchant.objects.all()
-    
 class C_MerchantArray(generics.ListCreateAPIView):
     queryset = MerchantArray.objects.all()
     serializer_class = S_MerchantArray
@@ -101,7 +75,6 @@ class C_MobSkill(generics.ListCreateAPIView):
         if id_mob is not None: return MobSkill.objects.filter(id_mob=id_mob)
         return MobSkill.objects.all()
 
-
 # class OwnerViewSet(viewsets.ModelViewSet):
 #     queryset = Owner.objects.all()
 #     serializer_class = S_Owner
@@ -136,22 +109,34 @@ def get_csrf_token(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def C_Login(request):
-    # Retrieve data from request
     username = request.data.get('username')
     password = request.data.get('password')
-    
-    # Check if username and password are provided
+
     if not username or not password:
         return JsonResponse({'error': 'Username and password are required.'}, status=400)
 
-    # Authenticate the user
     user = authenticate(request, username=username, password=password)
 
     if user is not None:
-        # Log in the user and return a success message
         login(request, user)
-        user_type = 'Owner' if isinstance(user, Owner) else 'User'
-        return JsonResponse({'message': f'{user_type} logged in successfully'})
+        request.session.save()
 
-    # Return an error message if authentication fails
+        if isinstance(user, User):
+            excluded_tables = ['owner', 'user', 'userpermission', 'session', 'contenttype', 'group', 'permission', 'logentry']
+            
+            models = apps.get_models()
+            
+            for model in models:
+                model_name = model._meta.model_name
+                if model_name not in excluded_tables:
+                    if not UserPermission.objects.filter(user=user, table=model_name).exists():
+                        UserPermission.objects.create(user=user, table=model_name, get=False, put=False, post=False, delete=False)
+        
+        user_type = 'Owner' if isinstance(user, Owner) else 'User'
+        return JsonResponse({'message': f'{user_type} {user.name} logged in successfully'})
+    
     return JsonResponse({'error': 'Invalid credentials'}, status=400)
+
+class C_UserPermission(BasePermissionViewSet):
+    queryset = UserPermission.objects.all()
+    serializer_class = S_UserPermission

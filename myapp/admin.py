@@ -5,13 +5,13 @@ from .models import Owner, User, UserPermission
 class OwnerAdmin(admin.ModelAdmin):
     list_display = ('username', 'name', 'email', 'is_staff', 'is_active')
     search_fields = ('username', 'name', 'email')
-    filter_horizontal = ('user_permissions', 'groups')  # Makes selection boxes for permissions/groups
+    filter_horizontal = ('user_permissions', 'groups')  
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'name', 'owner', 'email', 'is_staff', 'is_active')
     search_fields = ('username', 'name', 'owner__name', 'email')
-    filter_horizontal = ('user_permissions', 'groups')  # Makes selection boxes for permissions/groups
+    filter_horizontal = ('user_permissions', 'groups')  
 
 @admin.register(UserPermission)
 class UserPermissionAdmin(admin.ModelAdmin):

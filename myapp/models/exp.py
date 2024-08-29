@@ -7,7 +7,7 @@ from .auth.account import Owner
 class Exp(models.Model):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name='exp_owner')
     
-    tblidx = UnsignedDwordField(unique=True)
+    tblidx = UnsignedDwordField(default=0)
     dwExp = UnsignedDwordField(default=0)
     dwNeed_Exp = UnsignedDwordField(default=0)
     wStageWinSolo = UnsignedWordField(default=0)
