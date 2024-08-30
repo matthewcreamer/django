@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.db import models
 from .models import Owner, User, UserPermission
 
 class BasePermissionViewSet(viewsets.ModelViewSet):
@@ -14,16 +15,12 @@ class BasePermissionViewSet(viewsets.ModelViewSet):
 
         if isinstance(user, Owner):
             if model_name == 'userpermission':
-                # Owners should see all UserPermission entries for their Users
-                return self.queryset.filter(user__in=user.users.all())  # Assuming `users` is related to Owner
-            # For other models, filter by owner
+                return self.queryset.filter(user__in=user.users.all())  
             return self.queryset.filter(owner=user)
 
         elif isinstance(user, User):
             if model_name == 'userpermission':
-                # Users should only see their own UserPermission entries
                 return self.queryset.filter(user=user)
-            # For other models, filter by their related Owner
             return self.queryset.filter(owner=user.owner)
 
         return self.queryset.none()
@@ -44,12 +41,9 @@ class BasePermissionViewSet(viewsets.ModelViewSet):
         action = self.determine_action(request)
         table_name = self.queryset.model._meta.model_name
 
-        # Check permissions for UserPermission
         if table_name == 'userpermission' and isinstance(user, Owner):
-            # Owners can see all UserPermissions of their Users
             return
         
-        # Check general permissions
         if not self.has_permission(user, action, table_name):
             print(f"Permission denied for user: {user}, action: {action}, table: {table_name}")
             self.permission_denied(request)
@@ -91,14 +85,33 @@ class BasePermissionViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
 class BaseSerializer(serializers.ModelSerializer):
+
+    def to_internal_value(self, data):
+        for field in self.Meta.model._meta.fields:
+            if field.name not in data or data[field.name] is None:
+                default = field.get_default()
+                if default is not models.NOT_PROVIDED:
+                    data[field.name] = default
+        return super().to_internal_value(data)
+
     def create(self, validated_data):
         request = self.context.get('request')
-        if request and request.user and hasattr(request.user, 'owner'):
-            validated_data['owner'] = request.user.owner
+
+        if request and request.user:
+            if hasattr(request.user, 'owner'):
+                validated_data['owner'] = request.user.owner
+            else:
+                validated_data['owner'] = request.user
+
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         request = self.context.get('request')
-        if request and request.user and hasattr(request.user, 'owner'):
-            instance.owner = request.user.owner
+
+        if request and request.user:
+            if hasattr(request.user, 'owner'):
+                instance.owner = request.user.owner
+            else:
+                instance.owner = request.user
+
         return super().update(instance, validated_data)

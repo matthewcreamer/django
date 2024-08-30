@@ -8,12 +8,6 @@ class S_Exp(BaseSerializer):
         fields = '__all__'
         read_only_fields = ('owner',)  
 
-    def create(self, validated_data):
-        request = self.context.get('request')
-        if request and request.user:
-            validated_data['owner'] = request.user
-        return super().create(validated_data)
-
 class S_Merchant(BaseSerializer):
     class Meta:
         model = Merchant
