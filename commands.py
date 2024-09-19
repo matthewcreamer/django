@@ -21,12 +21,4 @@
 #   TO-DO
 #   - create user model
 #   
-
-
-#   FEATURES
-#   - VPS purchase generate account for DBO
-#   - owner must create a server, only one can be made
-#   - owner import csv
-#   - owner create user accounts for team
-#   - owner set user permissions for each table and for GET, PUT, POST, DELETE, EXPORT
 #   - copy icon folder and name it as "DBO-[id_owner]"
