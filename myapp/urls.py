@@ -1,10 +1,19 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import get_csrf_token, C_Login, C_UserPermission, C_ExportCSV, C_ImportCSV, C_Exp, C_Merchant, C_MerchantArray, C_SlotMachine, C_SlotMachineItems, C_Mob, C_MobDrop, C_MobSkill
+from .views import C_Login, C_UserPermission, C_ExportCSV, C_ImportCSV, C_Exp, C_Merchant, C_MerchantArray, C_SlotMachine, C_SlotMachineItems, C_Mob, C_MobDrop, C_MobSkill
 
 router = DefaultRouter()
 router.register(r'exp', C_Exp, basename='exp')
+router.register(r'merchant', C_Merchant, basename='merchant')
+router.register(r'merchant-array', C_MerchantArray, basename='merchant-array')
+router.register(r'slot-machine', C_SlotMachine, basename='slot-machine')
+router.register(r'slot-machine-items', C_SlotMachineItems, basename='slot-machine-items')
+router.register(r'mob', C_Mob, basename='mob')
+router.register(r'mob-drop', C_MobDrop, basename='mob-drop')
+router.register(r'mob-skill', C_MobSkill, basename='mob-skill')
 router.register(r'user-permission', C_UserPermission, basename='user-permission')
+router.register(r'export-csv', C_ExportCSV, basename='export-csv')
+router.register(r'import-csv', C_ImportCSV, basename='import-csv')
 
 urlpatterns = [
     path('', include(router.urls)),

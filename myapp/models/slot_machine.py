@@ -4,13 +4,13 @@ from ..dbo_fields import UnsignedByteField, UnsignedWordField, UnsignedDwordFiel
 
 class SlotMachine(models.Model):
     tblidx = UnsignedDwordField(unique=True)
-    dwName = UnsignedDwordField()
+    dwName = UnsignedDwordField(default=0)
     wszNameText = models.CharField(max_length=255, blank=True, null=True)
     szFile_Name = models.CharField(max_length=255, blank=True, null=True)
-    byCoin = UnsignedByteField()
-    bOnOff = UnsignedByteField()
-    byType = UnsignedByteField()
-    wfirstWinCoin = UnsignedWordField()
+    byCoin = UnsignedByteField(default=0)
+    bOnOff = UnsignedByteField(default=0)
+    byType = UnsignedByteField(default=0)
+    wfirstWinCoin = UnsignedWordField(default=0)
 
 
     def __str__(self):
@@ -18,9 +18,9 @@ class SlotMachine(models.Model):
     
 class SlotMachineItems(models.Model):
     slot_machine = models.ForeignKey(SlotMachine, on_delete=models.CASCADE, related_name='slot_machine_items')
-    aItemTblidx = UnsignedDwordField()
-    byStack = UnsignedByteField()
-    wQuantity = UnsignedWordField()
+    aItemTblidx = UnsignedDwordField(default=0)
+    byStack = UnsignedByteField(default=0)
+    wQuantity = UnsignedWordField(default=0)
 
 
     def __str__(self):

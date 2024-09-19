@@ -21,7 +21,7 @@ class C_Merchant(BasePermissionViewSet):
     queryset = Merchant.objects.all()
     serializer_class = S_Merchant
 
-class C_MerchantArray(generics.ListCreateAPIView):
+class C_MerchantArray(BasePermissionViewSet):
     queryset = MerchantArray.objects.all()
     serializer_class = S_MerchantArray
 
@@ -30,7 +30,7 @@ class C_MerchantArray(generics.ListCreateAPIView):
         if id_merchant is not None: return MerchantArray.objects.filter(id_merchant=id_merchant)
         return MerchantArray.objects.all()
 
-class C_SlotMachine(generics.ListCreateAPIView):
+class C_SlotMachine(BasePermissionViewSet):
     queryset = SlotMachine.objects.all()
     serializer_class = S_SlotMachine
 
@@ -39,7 +39,7 @@ class C_SlotMachine(generics.ListCreateAPIView):
         if tblidx is not None: return SlotMachine.objects.filter(tblidx=tblidx)
         return SlotMachine.objects.all()
     
-class C_SlotMachineItems(generics.ListCreateAPIView):
+class C_SlotMachineItems(BasePermissionViewSet):
     queryset = SlotMachineItems.objects.all()
     serializer_class = S_SlotMachineItems
 
@@ -48,7 +48,7 @@ class C_SlotMachineItems(generics.ListCreateAPIView):
         if id_slot_machine is not None: return SlotMachineItems.objects.filter(id_slot_machine=id_slot_machine)
         return SlotMachineItems.objects.all()
 
-class C_Mob(generics.ListCreateAPIView):
+class C_Mob(BasePermissionViewSet):
     queryset = Mob.objects.all()
     serializer_class = S_Mob
 
@@ -57,7 +57,7 @@ class C_Mob(generics.ListCreateAPIView):
         if tblidx is not None: return Mob.objects.filter(tblidx=tblidx)
         return Mob.objects.all()
 
-class C_MobDrop(generics.ListCreateAPIView):
+class C_MobDrop(BasePermissionViewSet):
     queryset = MobDrop.objects.all()
     serializer_class = S_MobDrop
 
@@ -66,7 +66,7 @@ class C_MobDrop(generics.ListCreateAPIView):
         if id_mob is not None: return MerchantArray.objects.filter(id_mob=id_mob)
         return MobDrop.objects.all()
 
-class C_MobSkill(generics.ListCreateAPIView):
+class C_MobSkill(BasePermissionViewSet):
     queryset = MobSkill.objects.all()
     serializer_class = S_MobSkill
 
@@ -99,11 +99,6 @@ def C_ExportCSV(request: HttpRequest, model_name: str):
 
 def C_ImportCSV(request: HttpRequest, model_name: str):
     return ImportCSV(request, model_name)
-
-@csrf_exempt
-def get_csrf_token(request):
-    csrf_token = get_token(request)
-    return JsonResponse({'csrfToken': csrf_token})
 
 @csrf_exempt
 @api_view(['POST'])
